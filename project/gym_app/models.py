@@ -14,17 +14,32 @@ class Tracker(models.Model):
     currentWeight = models.IntegerField(max_length=4, default=170)
     goalWeight = models.IntegerField(default=160, max_length=4)
 
+
 class Task(models.Model):
     name = models.CharField(max_length=32)
+    LEG = 'LG'
+    CHEST = 'CH'
+    SHOULDER = 'SH'
+    NOTYPE = 'NT'
+    TYPE_OF_TASKS_CHOICES = (
+        (NOTYPE, 'No type'),
+        (LEG, 'Leg'),
+        (SHOULDER, 'Shoulder'),
+        (CHEST, 'Chest'),
+    )
+    typeTask = models.CharField(max_length=2,
+                                choices=TYPE_OF_TASKS_CHOICES,
+                                default=NOTYPE)
 
     def __unicode__(self):
         return u'%s' % (self.name)
 
+
 class Exercise(models.Model):
     task = models.ForeignKey(Task)
-    weight = models.IntegerField(max_length=4, default = 1)
-    repetition = models.IntegerField(max_length=4, default = 1)
-    sets = models.IntegerField(max_length=4, default = 1)
+    weight = models.IntegerField(max_length=4, default=1)
+    repetition = models.IntegerField(max_length=4, default=1)
+    sets = models.IntegerField(max_length=4, default=1)
 
     ONE = 1
     TWO = 2
@@ -43,10 +58,12 @@ class Exercise(models.Model):
         (SEVEN, 'Day 7'),
     )
     day = models.IntegerField(max_length=7,
-                                      choices=DAYS,
-                                      default=ONE)
+                              choices=DAYS,
+                              default=ONE)
+
     def __unicode__(self):
         return u'%d' % (self.id)
+
 
 class WorkoutPlan(models.Model):
     exercises = models.ManyToManyField(Exercise)
@@ -68,13 +85,14 @@ class BodyScreening(models.Model):
     inches = models.IntegerField(max_length=4, default=0)
     bodyfat = models.DecimalField(max_digits=6, decimal_places=2, default=0)
     bmi = models.DecimalField(max_digits=6, decimal_places=1, default=0)
+
     def __unicode__(self):
         return u'%d' % (self.id)
 
 
-
 class Athlete(models.Model):
-    user = models.OneToOneField(User) #Inheritance of User model
+    # Inheritance of User model
+    user = models.OneToOneField(User)
     tracker = models.OneToOneField(Tracker)
     workout_plan = models.OneToOneField(WorkoutPlan)
 
@@ -82,13 +100,13 @@ class Athlete(models.Model):
     INTERMEDIATE = 'IN'
     ADVANCED = 'AD'
     LEVELS = (
-        (BEGGINER, 'Beginner'),
+        (BEGGINER, 'Begginer'),
         (INTERMEDIATE, 'Intermediate'),
         (ADVANCED, 'Advanced'),
     )
     level = models.CharField(max_length=2,
-                                      choices=LEVELS,
-                                      default=BEGGINER)
+                             choices=LEVELS,
+                             default=BEGGINER)
 
     MORNING = 'MO'
     AFTERNOON = 'AF'
@@ -99,8 +117,8 @@ class Athlete(models.Model):
         (NIGHT, 'Night'),
     )
     training_period = models.CharField(max_length=2,
-                                      choices=TRAINING_PERIOD,
-                                      default=MORNING)
+                                       choices=TRAINING_PERIOD,
+                                       default=MORNING)
 
     MALE = 'M'
     FEMALE = 'F'
@@ -109,8 +127,8 @@ class Athlete(models.Model):
         (FEMALE, 'Female'),
     )
     gender = models.CharField(max_length=2,
-                                      choices=GENDERS,
-                                      default=MALE)
+                              choices=GENDERS,
+                              default=MALE)
 
     screenings = models.ManyToManyField(BodyScreening)
 
@@ -118,10 +136,11 @@ class Athlete(models.Model):
         if self.user.username:
             return u'%s' % (self.user.username)
 
-#Message System
+
+# Message System
 class Message(models.Model):
     sbj = models.CharField(max_length=50)
-    body = models.TextField(max_length = 500)
+    body = models.TextField(max_length=500)
     src = models.CharField(max_length=50)
 
 
@@ -130,16 +149,16 @@ class MailBox(models.Model):
     messages = models.ManyToManyField(Message)
 
     def add_msg(self, body, sbj, src):
-        self.messages.create(body = body, sbj = sbj, src = src)
+        self.messages.create(body=body, sbj=sbj, src=src)
 
     def get_msg(self):
         pass
 
     def del_msg(self, id):
-        Message.objects.filter(id = id).delete()
+        Message.objects.filter(id=id).delete()
 
-#end Message System
 
+# end Message System
 class PersonalTrainer(models.Model):
     user = models.OneToOneField(User)
 
@@ -150,13 +169,5 @@ class PersonalTrainer(models.Model):
         (FEMALE, 'Female'),
     )
     gender = models.CharField(max_length=2,
-                                      choices=GENDERS,
-                                      default=MALE)
-
-
-
-
-
-
-
-
+                              choices=GENDERS,
+                              default=MALE)
