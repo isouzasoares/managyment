@@ -12,13 +12,16 @@ from django.core.mail import send_mail
 from django.contrib.auth.models import Group
 
 # Create your views here.
-#This is the First Page's view.
+# This is the First Page's view.
+
+
 @login_required
 def index(request):
-	# Construct a dictionary to pass to the template engine as its context.
-    # Note the key boldmessage is the same as {{ boldmessage }} in the template!
-    if request.user.is_superuser:   
-        group = 'admin';
+    # Construct a dictionary to pass to the template engine as its context.
+    # Note the key boldmessage is the same as {{ boldmessage }} in
+    # the template!
+    if request.user.is_superuser:
+        group = 'admin'
     else:
         try:
             group = User.objects.get(username=request.user.username).groups.all()[0].name;
@@ -28,15 +31,18 @@ def index(request):
     # We make use of the shortcut function to make our lives easier.
     # Note that the first parameter is the template we wish to use.
 
-    context_dict = {'boldmessage': "Excuse us, programmers working :)", 'group': group}
+    context_dict = {'boldmessage': "Excuse us, programmers working :)",
+                    'group': group}
     return render(request, 'gym_app/index.html', context_dict)
+
 
 @login_required
 def workout(request):
     # Construct a dictionary to pass to the template engine as its context.
-    # Note the key boldmessage is the same as {{ boldmessage }} in the template!
-    if request.user.is_superuser:   
-        group = 'admin';
+    # Note the key boldmessage is the same as {{ boldmessage }}
+    # in the template!
+    if request.user.is_superuser:
+        group = 'admin'
     else:
         try:
             group = User.objects.get(username=request.user.username).groups.all()[0].name;
@@ -45,7 +51,7 @@ def workout(request):
 
     t_list = Task.objects.all()
 
-    context = {'task_list' : t_list, 'group':group}
+    context = {'task_list': t_list, 'group': group}
 
     # Return a rendered response to send to the client.
     # We make use of the shortcut function to make our lives easier.
@@ -53,10 +59,13 @@ def workout(request):
 
     return render(request, 'gym_app/workout.html', context)
 
+
 def register(request):
 
-    # A boolean value for telling the template whether the registration was successful.
-    # Set to False initially. Code changes value to True when registration succeeds.
+    # A boolean value for telling the template whether the registration was
+    # successful.
+    # Set to False initially. Code changes value to True when registration
+    # succeeds.
     registered = False
 
     # If it's a HTTP POST, we're interested in processing form data.
@@ -83,10 +92,12 @@ def register(request):
                 user.groups.add(group)
 
             # Now sort out the UserProfile instance.
-            # Since we need to set the user attribute ourselves, we set commit=False.
-            # This delays saving the model until we're ready to avoid integrity problems.
-            #profile = profile_form.save(commit=False)
-            #profile.user = user
+            # Since we need to set the user attribute ourselves, we set
+            # commit=False.
+            # This delays saving the model until we're ready to avoid integrity
+            # problems.
+            # profile = profile_form.save(commit=False)
+            # profile.user = user
 
             if group.name == "regular" or group.name == "premium":
                 athlete = Athlete()
@@ -107,15 +118,16 @@ def register(request):
                     personal.gender = gender_form.cleaned_data['gender']
                 personal.save()
 
-            #Create MailBox
+            # Create MailBox
             mail_box = MailBox()
             mail_box.owner = user.username
             mail_box.save()
 
-            mail_box_admin = MailBox.objects.get(owner = "admin")
+            mail_box_admin = MailBox.objects.get(owner="admin")
             mail_box_admin.add_msg('SIGN UP', "Sign Up Request.", user.username)
 
-            # Update our variable to tell the template registration was successful.
+            # Update our variable to tell the template registration was
+            # successful.
             registered = True
 
         # Invalid form or forms - mistakes or something else?
@@ -130,12 +142,16 @@ def register(request):
         user_form = UserForm()
         type_form = UserTypeForm()
         gender_form = UserGenderForm()
-        #profile_form = UserProfileForm()
+        # profile_form = UserProfileForm()
 
     # Render the template depending on the context.
     return render(request,
-            'gym_app/register.html',
-            {'user_form': user_form, 'registered': registered, 'type_form':type_form, 'gender_form':gender_form} )    
+                  'gym_app/register.html',
+                  {'user_form': user_form,
+                   'registered': registered,
+                   'type_form': type_form,
+                   'gender_form': gender_form})
+
 
 def user_login(request):
 
@@ -143,9 +159,12 @@ def user_login(request):
     if request.method == 'POST':
         # Gather the username and password provided by the user.
         # This information is obtained from the login form.
-                # We use request.POST.get('<variable>') as opposed to request.POST['<variable>'],
-                # because the request.POST.get('<variable>') returns None, if the value does not exist,
-                # while the request.POST['<variable>'] will raise key error exception
+                # We use request.POST.get('<variable>') as opposed
+                # to request.POST['<variable>'],
+                # because the request.POST.get('<variable>') returns None,
+                # if the value does not exist,
+                # while the request.POST['<variable>'] will raise key error
+                # exception
         username = request.POST.get('username')
         password = request.POST.get('password')
 
@@ -154,7 +173,8 @@ def user_login(request):
         user = authenticate(username=username, password=password)
 
         # If we have a User object, the details are correct.
-        # If None (Python's way of representing the absence of a value), no user
+        # If None (Python's way of representing the absence of a value), no
+        # user
         # with matching credentials was found.
         if user:
             # Is the account active? It could have been disabled.
@@ -168,8 +188,8 @@ def user_login(request):
                 return HttpResponseRedirect('/permission_denied/')
         else:
             # Bad login details were provided. So we can't log the user in.
-            return render(request, 'gym_app/login.html', {'invalid': True })
-            #return HttpResponse("Invalid login details supplied.")
+            return render(request, 'gym_app/login.html', {'invalid': True})
+            # return HttpResponse("Invalid login details supplied.")
 
     # The request is not a HTTP POST, so display the login form.
     # This scenario would most likely be a HTTP GET.
@@ -178,14 +198,15 @@ def user_login(request):
         # blank dictionary object...
         return render(request, 'gym_app/login.html', {})
 
-# Use the login_required() decorator to ensure only those logged in can access the view.
+# Use the login_required() decorator to ensure only those logged in can access
+# the view.
 #@login_required
 def user_logout(request):
     # Since we know the user is logged in, we can now just log them out.
     logout(request)
 
     # Take the user back to the homepage.
-    return HttpResponseRedirect('/index/')    
+    return HttpResponseRedirect('/index/')
 
 #This is the First Page's view.
 @login_required
